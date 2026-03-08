@@ -20,7 +20,7 @@ auth_bp = Blueprint('auth', __name__)
 def register():
     """Patient registration"""
     try:
-        data = request.get_json()
+        data = request.get_json() or {}
 
         # Check if user exists
         if User.query.filter_by(username=data.get('username')).first():

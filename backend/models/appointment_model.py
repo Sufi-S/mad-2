@@ -14,8 +14,17 @@ class Appointment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationship with treatment
-    treatment = db.relationship('Treatment', backref='appointment', uselist=False, cascade='all, delete-orphan')
+    # Relationships
+    patient = db.relationship('Patient', backref='appointments')
+    doctor = db.relationship('Doctor', backref='appointments')
+    
+    # Relationship with treatment (one-to-one)
+    treatment = db.relationship(
+        'Treatment', 
+        backref='appointment', 
+        uselist=False, 
+        cascade='all, delete-orphan'
+    )
     
     def to_dict(self):
         return {
@@ -28,5 +37,6 @@ class Appointment(db.Model):
             'appointment_time': self.appointment_time,
             'status': self.status,
             'symptoms': self.symptoms,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'treatment': self.treatment.to_dict() if self.treatment else None
         }

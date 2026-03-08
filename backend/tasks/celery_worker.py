@@ -1,15 +1,10 @@
-from celery import Celery
+from backend.extensions import celery
 from backend.config import Config
 
-# Initialize Celery
-celery = Celery(
-    'hospital_tasks',
-    broker=Config.CELERY_BROKER_URL,
-    backend=Config.CELERY_RESULT_BACKEND
-)
-
-# Configure Celery
+# Configure the existing Celery instance from extensions
 celery.conf.update(
+    broker_url=Config.CELERY_BROKER_URL,
+    result_backend=Config.CELERY_RESULT_BACKEND,
     task_serializer='json',
     accept_content=['json'],
     result_serializer='json',

@@ -16,7 +16,8 @@ patient_bp = Blueprint('patient', __name__)
 def patient_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        current_user_id = get_jwt_identity()
+        # FIXED: Convert string ID to int
+        current_user_id = int(get_jwt_identity())
         user = User.query.get(current_user_id)
         if not user or user.role != 'patient':
             return jsonify({'error': 'Patient access required'}), 403
@@ -25,7 +26,8 @@ def patient_required(f):
 
 def get_patient_profile():
     """Helper to get patient profile from current user"""
-    current_user_id = get_jwt_identity()
+    # FIXED: Convert string ID to int
+    current_user_id = int(get_jwt_identity())
     user = User.query.get(current_user_id)
     return Patient.query.filter_by(user_id=user.id).first()
 

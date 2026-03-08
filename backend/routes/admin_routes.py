@@ -8,13 +8,15 @@ from backend.models.appointment_model import Appointment
 from backend.models.department_model import Department
 from functools import wraps
 from sqlalchemy import or_
+import json
 
 admin_bp = Blueprint('admin', __name__)
 
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        current_user_id = get_jwt_identity()
+        # FIXED: Convert string ID to int
+        current_user_id = int(get_jwt_identity())
         user = User.query.get(current_user_id)
         if not user or user.role != 'admin':
             return jsonify({'error': 'Admin access required'}), 403
@@ -66,6 +68,10 @@ def add_doctor():
     if existing_user:
         return jsonify({'error': 'Email already exists'}), 400
     
+    # Check if username exists
+    if User.query.filter_by(username=data.get('username')).first():
+        return jsonify({'error': 'Username already exists'}), 400
+    
     # Create user account for doctor
     user = User(
         username=data.get('username'),
@@ -78,7 +84,6 @@ def add_doctor():
     db.session.flush()
     
     # Create doctor profile
-    import json
     doctor = Doctor(
         user_id=user.id,
         name=data.get('name'),
@@ -86,7 +91,7 @@ def add_doctor():
         qualification=data.get('qualification'),
         experience_years=data.get('experience_years'),
         consultation_fee=data.get('consultation_fee'),
-        availability=json.dumps(data.get('availability', {}))
+        availability=json.dumps(data.get('availability', {})) if data.get('availability') else None
     )
     
     db.session.add(doctor)
@@ -109,7 +114,6 @@ def update_doctor(doctor_id):
     doctor.consultation_fee = data.get('consultation_fee', doctor.consultation_fee)
     
     if data.get('availability'):
-        import json
         doctor.availability = json.dumps(data.get('availability'))
     
     db.session.commit()
@@ -131,6 +135,21 @@ def delete_doctor(doctor_id):
     db.session.commit()
     
     return jsonify({'message': 'Doctor deactivated successfully'}), 200
+
+@admin_bp.route('/doctors/<int:doctor_id>/activate', methods=['PUT'])
+@jwt_required()
+@admin_required
+def activate_doctor(doctor_id):
+    """Reactivate a deactivated doctor"""
+    doctor = Doctor.query.get_or_404(doctor_id)
+    
+    user = User.query.get(doctor.user_id)
+    if user:
+        user.is_active = True
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Doctor activated successfully'}), 200
 
 @admin_bp.route('/patients', methods=['GET'])
 @jwt_required()
@@ -156,6 +175,21 @@ def delete_patient(patient_id):
     
     return jsonify({'message': 'Patient deactivated successfully'}), 200
 
+@admin_bp.route('/patients/<int:patient_id>/activate', methods=['PUT'])
+@jwt_required()
+@admin_required
+def activate_patient(patient_id):
+    """Reactivate a deactivated patient"""
+    patient = Patient.query.get_or_404(patient_id)
+    
+    user = User.query.get(patient.user_id)
+    if user:
+        user.is_active = True
+    
+    db.session.commit()
+    
+    return jsonify({'message': 'Patient activated successfully'}), 200
+
 @admin_bp.route('/appointments', methods=['GET'])
 @jwt_required()
 @admin_required
@@ -170,11 +204,11 @@ def get_all_appointments():
 def search():
     """Search patients or doctors"""
     query = request.args.get('q', '')
-    type = request.args.get('type', 'all')  # patients, doctors, all
+    search_type = request.args.get('type', 'all')  # patients, doctors, all
     
     results = {}
     
-    if type in ['patients', 'all']:
+    if search_type in ['patients', 'all']:
         patients = Patient.query.filter(
             or_(
                 Patient.name.ilike(f'%{query}%'),
@@ -183,7 +217,7 @@ def search():
         ).all()
         results['patients'] = [p.to_dict() for p in patients]
     
-    if type in ['doctors', 'all']:
+    if search_type in ['doctors', 'all']:
         doctors = Doctor.query.filter(
             or_(
                 Doctor.name.ilike(f'%{query}%'),
@@ -201,3 +235,25 @@ def get_departments():
     """Get all departments"""
     departments = Department.query.all()
     return jsonify([dept.to_dict() for dept in departments]), 200
+
+@admin_bp.route('/users', methods=['GET'])
+@jwt_required()
+@admin_required
+def get_all_users():
+    """Get all users with their profiles"""
+    users = User.query.all()
+    result = []
+    
+    for user in users:
+        user_dict = user.to_dict()
+        # Add profile info based on role
+        if user.role == 'doctor':
+            doctor = Doctor.query.filter_by(user_id=user.id).first()
+            user_dict['profile'] = doctor.to_dict() if doctor else None
+        elif user.role == 'patient':
+            patient = Patient.query.filter_by(user_id=user.id).first()
+            user_dict['profile'] = patient.to_dict() if patient else None
+        
+        result.append(user_dict)
+    
+    return jsonify(result), 200

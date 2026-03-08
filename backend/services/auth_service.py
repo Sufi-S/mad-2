@@ -1,6 +1,6 @@
-from extensions import db, bcrypt
-from models.user_model import User
-from models.patient_model import Patient
+from backend.extensions import db, bcrypt
+from backend.models.user_model import User
+from backend.models.patient_model import Patient
 from flask_jwt_extended import create_access_token, create_refresh_token
 from datetime import timedelta
 
@@ -14,12 +14,13 @@ class AuthService:
             if not user.is_active:
                 return {'error': 'Account is deactivated'}, None
             
+            # FIXED: Convert user.id to string for JWT identity
             access_token = create_access_token(
-                identity=user.id,
+                identity=str(user.id),
                 additional_claims={'role': user.role},
                 expires_delta=timedelta(hours=1)
             )
-            refresh_token = create_refresh_token(identity=user.id)
+            refresh_token = create_refresh_token(identity=str(user.id))
             
             return {
                 'access_token': access_token,

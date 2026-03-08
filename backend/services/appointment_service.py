@@ -1,6 +1,6 @@
-from extensions import db
-from models.appointment_model import Appointment
-from models.doctor_model import Doctor
+from backend.extensions import db
+from backend.models.appointment_model import Appointment
+from backend.models.doctor_model import Doctor
 from datetime import datetime, timedelta
 import json
 
