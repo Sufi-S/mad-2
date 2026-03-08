@@ -14,8 +14,13 @@ class Doctor(db.Model):
     availability = db.Column(db.Text)  # JSON string for weekly schedule
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
-    appointments = db.relationship('Appointment', backref='doctor', lazy=True, cascade='all, delete-orphan')
+    # Relationships - CHANGED: backref to back_populates
+    appointments = db.relationship(
+        'Appointment', 
+        back_populates='doctor',  # Changed from backref='doctor'
+        lazy=True, 
+        cascade='all, delete-orphan'
+    )
     treatments = db.relationship('Treatment', backref='doctor', lazy=True)
     
     def to_dict(self):

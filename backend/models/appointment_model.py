@@ -14,9 +14,9 @@ class Appointment(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Relationships - Using back_populates for bidirectional relationship
+    # Relationships - Using back_populates for BOTH sides (Patient and Doctor)
     patient = db.relationship('Patient', back_populates='appointments')
-    doctor = db.relationship('Doctor', backref='appointments')
+    doctor = db.relationship('Doctor', back_populates='appointments')  # CHANGED: Now using back_populates
     
     # Relationship with treatment (one-to-one)
     treatment = db.relationship(
