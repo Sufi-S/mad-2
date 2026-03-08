@@ -11,6 +11,7 @@ import DoctorLayout from '../components/doctor/DoctorLayout.vue'
 import PatientLayout from '../components/patient/PatientLayout.vue'
 
 // Content components
+import AdminDashboardContent from '../components/admin/AdminDashboardContent.vue'
 import DoctorManagement from '../components/admin/DoctorManagement.vue'
 import DoctorDashboard from '../components/doctor/DoctorDashboard.vue'
 import TreatmentForm from '../components/doctor/TreatmentForm.vue'
@@ -48,7 +49,7 @@ const routes = [
       {
         path: 'dashboard',
         name: 'AdminDashboard',
-        component: AdminDashboard
+        component: AdminDashboardContent  // Use the content component
       },
       {
         path: 'doctors',

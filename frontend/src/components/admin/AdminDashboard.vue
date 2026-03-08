@@ -31,125 +31,13 @@
     <div class="main-content">
       <router-view></router-view>
     </div>
-
-    <!-- Delete Confirmation Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" ref="deleteModal">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">
-              <i class="fas fa-exclamation-triangle text-danger me-2"></i>
-              Confirm Delete
-            </h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-          </div>
-          <div class="modal-body">
-            Are you sure you want to delete {{ deleteTarget?.name }}?
-            <p class="text-muted mt-2">
-              <small>This will deactivate the user account. This action can be undone by reactivating.</small>
-            </p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger" @click="deleteConfirmed">
-              <i class="fas fa-trash me-2"></i>
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
 export default {
   name: 'AdminDashboard',
-  data() {
-    return {
-      stats: {},
-      appointments: [],
-      searchQuery: '',
-      searchType: 'all',
-      searchResults: null,
-      showSearch: false,
-      loading: false,
-      deleteTarget: null
-    }
-  },
-  mounted() {
-    this.fetchData()
-    if (this.$refs.deleteModal) {
-      this.deleteModal = new bootstrap.Modal(this.$refs.deleteModal)
-    }
-  },
   methods: {
-    async fetchData() {
-      this.loading = true
-      try {
-        const [dashboard, appointments] = await Promise.all([
-          this.$api.getAdminDashboard(),
-          this.$api.getAllAppointments()
-        ])
-        
-        this.stats = dashboard.data
-        this.appointments = appointments.data.slice(0, 10) // Last 10 appointments
-        
-      } catch (error) {
-        console.error('Error fetching data:', error)
-      } finally {
-        this.loading = false
-      }
-    },
-    
-    async refreshData() {
-      await this.fetchData()
-    },
-    
-    async performSearch() {
-      if (!this.searchQuery.trim()) {
-        this.searchResults = null
-        return
-      }
-      
-      try {
-        const response = await this.$api.search(this.searchQuery, this.searchType)
-        this.searchResults = response.data
-      } catch (error) {
-        console.error('Search error:', error)
-      }
-    },
-    
-    confirmDeletePatient(patient) {
-      this.deleteTarget = { type: 'patient', id: patient.id, name: patient.name }
-      this.deleteModal.show()
-    },
-    
-    async deleteConfirmed() {
-      try {
-        if (this.deleteTarget.type === 'patient') {
-          await this.$api.deletePatient(this.deleteTarget.id)
-        }
-        
-        this.deleteModal.hide()
-        this.searchResults = null
-        this.searchQuery = ''
-        await this.fetchData()
-        
-      } catch (error) {
-        alert('Error deleting user')
-      }
-    },
-    
-    formatDate(date) {
-      return new Date(date).toLocaleDateString()
-    },
-    
-    exportReport() {
-      // TODO: Implement report export
-      alert('Report export feature coming soon!')
-    },
-    
     logout() {
       localStorage.clear()
       this.$router.push('/login')
