@@ -1,7 +1,7 @@
-from models.appointment_model import Appointment
-from models.treatment_model import Treatment
-from models.doctor_model import Doctor
-from models.patient_model import Patient
+from backend.models.appointment_model import Appointment
+from backend.models.treatment_model import Treatment
+from backend.models.doctor_model import Doctor
+from backend.models.patient_model import Patient
 from datetime import datetime, timedelta
 import csv
 from io import StringIO
