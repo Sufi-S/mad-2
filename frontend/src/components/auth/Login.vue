@@ -127,8 +127,19 @@ export default {
           localStorage.setItem('profile', JSON.stringify(userData.profile))
         }
         
-        // Emit success event to App.vue
-        this.$emit('auth-success', userData)
+        // FIXED: Redirect based on role instead of emitting event
+        const role = userData.user.role
+        
+        if (role === 'admin') {
+          this.$router.push('/admin/dashboard')
+        } else if (role === 'doctor') {
+          this.$router.push('/doctor/dashboard')
+        } else if (role === 'patient') {
+          this.$router.push('/patient/dashboard')
+        } else {
+          // Fallback to home if role is unknown
+          this.$router.push('/')
+        }
         
       } catch (error) {
         this.error = error.response?.data?.error || 'Login failed. Please try again.'

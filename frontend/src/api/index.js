@@ -67,13 +67,23 @@ const api = {
   getPatients: () => apiClient.get('/admin/patients'),
   deletePatient: (id) => apiClient.delete(`/admin/patients/${id}`),
   getAllAppointments: () => apiClient.get('/admin/appointments'),
-  search: (query, type) => apiClient.get(`/admin/search?q=${query}&type=${type}`),
+  search: (query, type) => {
+    const params = new URLSearchParams()
+    if (query) params.append('q', query)
+    if (type) params.append('type', type)
+    return apiClient.get(`/admin/search?${params.toString()}`)
+  },
   getDepartments: () => apiClient.get('/admin/departments'),
   
   // Doctor
   getDoctorDashboard: () => apiClient.get('/doctor/dashboard'),
-  getDoctorAppointments: (status, from, to) => 
-    apiClient.get(`/doctor/appointments?${status ? 'status='+status : ''}${from ? '&from='+from : ''}${to ? '&to='+to : ''}`),
+  getDoctorAppointments: (status, from, to) => {
+    const params = new URLSearchParams()
+    if (status) params.append('status', status)
+    if (from) params.append('from', from)
+    if (to) params.append('to', to)
+    return apiClient.get(`/doctor/appointments?${params.toString()}`)
+  },
   updateAppointmentStatus: (id, status) => 
     apiClient.put(`/doctor/appointments/${id}/status`, { status }),
   saveTreatment: (appointmentId, treatmentData) => 
@@ -85,14 +95,22 @@ const api = {
   // Patient
   getPatientDashboard: () => apiClient.get('/patient/dashboard'),
   updatePatientProfile: (profileData) => apiClient.put('/patient/profile', profileData),
-  searchDoctors: (specialization, name) => 
-    apiClient.get(`/patient/doctors?${specialization ? 'specialization='+specialization : ''}${name ? '&name='+name : ''}`),
+  searchDoctors: (specialization, name) => {
+    const params = new URLSearchParams()
+    if (specialization) params.append('specialization', specialization)
+    if (name) params.append('name', name)
+    return apiClient.get(`/patient/doctors?${params.toString()}`)
+  },
   getDoctorAvailability: (doctorId) => apiClient.get(`/patient/doctors/${doctorId}/availability`),
   bookAppointment: (appointmentData) => apiClient.post('/patient/appointments', appointmentData),
   rescheduleAppointment: (id, date, time) => 
     apiClient.put(`/patient/appointments/${id}`, { date, time }),
   cancelAppointment: (id) => apiClient.delete(`/patient/appointments/${id}`),
-  getMyAppointments: (status) => apiClient.get(`/patient/appointments${status ? '?status='+status : ''}`),
+  getMyAppointments: (status) => {
+    const params = new URLSearchParams()
+    if (status) params.append('status', status)
+    return apiClient.get(`/patient/appointments${params.toString() ? '?' + params.toString() : ''}`)
+  },
   getTreatmentHistory: () => apiClient.get('/patient/treatments')
 }
 

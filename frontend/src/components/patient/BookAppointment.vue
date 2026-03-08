@@ -152,6 +152,7 @@
                     class="btn w-100" 
                     :class="selectedDate === date ? 'btn-primary' : 'btn-secondary'"
                     @click="selectDate(date)"
+                    :disabled="!isDateAvailable(date)"
                   >
                     {{ formatDate(date) }}
                   </button>
@@ -173,6 +174,9 @@
                 >
                   {{ slot }}
                 </span>
+                <div v-if="availableSlots.length === 0" class="text-muted">
+                  No available slots for this date
+                </div>
               </div>
             </div>
 
@@ -278,6 +282,11 @@ export default {
         const response = await this.$api.getDoctorAvailability(this.selectedDoctor.id)
         this.bookedSlots = response.data.booked_slots || {}
         
+        // Also store doctor's availability schedule
+        if (response.data.availability) {
+          this.selectedDoctor.availability = response.data.availability
+        }
+        
         // Generate next 7 days
         this.generateAvailableDates()
         
@@ -300,16 +309,21 @@ export default {
       this.availableDates = dates
     },
     
+    isDateAvailable(date) {
+      // Check if doctor has availability for this specific date
+      const doctorAvailability = this.selectedDoctor?.availability || {}
+      return doctorAvailability[date] && doctorAvailability[date].length > 0
+    },
+    
     selectDate(date) {
       this.selectedDate = date
       this.selectedTime = null
       
-      // Get available slots for this date
-      const dayName = new Date(date).toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase()
+      // FIXED: Use date directly instead of converting to day name
       const doctorAvailability = this.selectedDoctor.availability || {}
       
-      // Get doctor's available slots for this day
-      const availableForDay = doctorAvailability[dayName] || []
+      // Get doctor's available slots for this specific date
+      const availableForDay = doctorAvailability[date] || []
       
       // Remove booked slots
       const bookedForDate = this.bookedSlots[date] || []
