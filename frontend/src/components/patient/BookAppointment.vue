@@ -66,6 +66,10 @@
             <div v-else-if="doctors.length === 0" class="text-center text-muted py-4">
               <i class="fas fa-user-md fa-3x mb-3"></i>
               <p>No doctors found</p>
+              <router-link to="/patient/dashboard" class="btn btn-primary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Dashboard
+              </router-link>
             </div>
             
             <div v-else class="row">

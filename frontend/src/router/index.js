@@ -5,15 +5,15 @@ import VueRouter from 'vue-router'
 import Login from '../components/auth/Login.vue'
 import Register from '../components/auth/Register.vue'
 
-// Admin components
-import AdminDashboard from '../components/admin/AdminDashboard.vue'
-import DoctorManagement from '../components/admin/DoctorManagement.vue'
+// Layout components
+import AdminDashboard from '../components/admin/AdminDashboard.vue' // This already has layout
+import DoctorLayout from '../components/doctor/DoctorLayout.vue'
+import PatientLayout from '../components/patient/PatientLayout.vue'
 
-// Doctor components
+// Content components
+import DoctorManagement from '../components/admin/DoctorManagement.vue'
 import DoctorDashboard from '../components/doctor/DoctorDashboard.vue'
 import TreatmentForm from '../components/doctor/TreatmentForm.vue'
-
-// Patient components
 import PatientDashboard from '../components/patient/PatientDashboard.vue'
 import BookAppointment from '../components/patient/BookAppointment.vue'
 import TreatmentHistory from '../components/patient/TreatmentHistory.vue'
@@ -35,64 +35,88 @@ const routes = [
     meta: { guest: true }
   },
   
-  // Admin routes
+  // Admin routes - AdminDashboard already has layout
   {
-    path: '/admin/dashboard',
-    name: 'AdminDashboard',
+    path: '/admin',
     component: AdminDashboard,
-    meta: { requiresAuth: true, role: 'admin' }
-  },
-  {
-    path: '/admin/doctors',
-    name: 'DoctorManagement',
-    component: DoctorManagement,
-    meta: { requiresAuth: true, role: 'admin' }
-  },
-  
-  // Doctor routes
-  {
-    path: '/doctor/dashboard',
-    name: 'DoctorDashboard',
-    component: DoctorDashboard,
-    meta: { requiresAuth: true, role: 'doctor' }
-  },
-  {
-    path: '/doctor/treatment/:appointmentId',
-    name: 'TreatmentForm',
-    component: TreatmentForm,
-    meta: { requiresAuth: true, role: 'doctor' }
+    meta: { requiresAuth: true, role: 'admin' },
+    children: [
+      {
+        path: '',
+        redirect: '/admin/dashboard'
+      },
+      {
+        path: 'dashboard',
+        name: 'AdminDashboard',
+        component: AdminDashboard
+      },
+      {
+        path: 'doctors',
+        name: 'DoctorManagement',
+        component: DoctorManagement
+      }
+    ]
   },
   
-  // Patient routes
+  // Doctor routes - using DoctorLayout
   {
-    path: '/patient/dashboard',
-    name: 'PatientDashboard',
-    component: PatientDashboard,
-    meta: { requiresAuth: true, role: 'patient' }
+    path: '/doctor',
+    component: DoctorLayout,
+    meta: { requiresAuth: true, role: 'doctor' },
+    children: [
+      {
+        path: '',
+        redirect: '/doctor/dashboard'
+      },
+      {
+        path: 'dashboard',
+        name: 'DoctorDashboard',
+        component: DoctorDashboard
+      },
+      {
+        path: 'treatment/:appointmentId?',
+        name: 'TreatmentForm',
+        component: TreatmentForm
+      }
+    ]
   },
+  
+  // Patient routes - using PatientLayout
   {
-    path: '/doctors',
-    name: 'DoctorList',
-    component: BookAppointment, // Reusing component for listing
-    meta: { requiresAuth: true, role: 'patient' }
-  },
-  {
-    path: '/book-appointment',
-    name: 'BookAppointment',
-    component: BookAppointment,
-    meta: { requiresAuth: true, role: 'patient' }
-  },
-  {
-    path: '/book-appointment/:doctorId',
-    name: 'BookAppointmentWithDoctor',
-    component: BookAppointment,
-    meta: { requiresAuth: true, role: 'patient' }
-  },
-  {
-    path: '/treatment-history',
-    name: 'TreatmentHistory',
-    component: TreatmentHistory,
-    meta: { requiresAuth: true, role: 'patient' }
+    path: '/patient',
+    component: PatientLayout,
+    meta: { requiresAuth: true, role: 'patient' },
+    children: [
+      {
+        path: '',
+        redirect: '/patient/dashboard'
+      },
+      {
+        path: 'dashboard',
+        name: 'PatientDashboard',
+        component: PatientDashboard
+      },
+      {
+        path: 'book-appointment',
+        name: 'BookAppointment',
+        component: BookAppointment
+      },
+      {
+        path: 'book-appointment/:doctorId',
+        name: 'BookAppointmentWithDoctor',
+        component: BookAppointment
+      },
+      {
+        path: 'treatment-history',
+        name: 'TreatmentHistory',
+        component: TreatmentHistory
+      },
+      {
+        path: 'doctors',
+        name: 'DoctorList',
+        component: BookAppointment
+      }
+    ]
   },
   
   // Redirect

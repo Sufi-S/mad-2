@@ -1,249 +1,35 @@
 <template>
-  <div>
-    <!-- Page Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2>
-        <i class="fas fa-tachometer-alt me-2"></i>
-        Admin Dashboard
-      </h2>
-      <div>
-        <button class="btn btn-primary me-2" @click="refreshData">
-          <i class="fas fa-sync-alt me-2"></i>
-          Refresh
-        </button>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <h3>Admin Panel</h3>
       </div>
+      <ul class="nav flex-column">
+        <li class="nav-item">
+          <router-link to="/admin/dashboard" class="nav-link" active-class="active">
+            <i class="fas fa-tachometer-alt me-2"></i>
+            Dashboard
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link to="/admin/doctors" class="nav-link" active-class="active">
+            <i class="fas fa-user-md me-2"></i>
+            Manage Doctors
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <a href="#" class="nav-link" @click.prevent="logout">
+            <i class="fas fa-sign-out-alt me-2"></i>
+            Logout
+          </a>
+        </li>
+      </ul>
     </div>
 
-    <!-- Stats Cards -->
-    <div class="row mb-4">
-      <div class="col-md-3 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-user-md"></i>
-          </div>
-          <div class="stat-value">{{ stats.total_doctors || 0 }}</div>
-          <div class="stat-label">Total Doctors</div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-users"></i>
-          </div>
-          <div class="stat-value">{{ stats.total_patients || 0 }}</div>
-          <div class="stat-label">Total Patients</div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-calendar-check"></i>
-          </div>
-          <div class="stat-value">{{ stats.total_appointments || 0 }}</div>
-          <div class="stat-label">Total Appointments</div>
-        </div>
-      </div>
-      <div class="col-md-3 mb-3">
-        <div class="stat-card">
-          <div class="stat-icon">
-            <i class="fas fa-chart-line"></i>
-          </div>
-          <div class="stat-value">{{ stats.appointment_stats?.completed || 0 }}</div>
-          <div class="stat-label">Completed</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Quick Actions -->
-    <div class="row mb-4">
-      <div class="col-12">
-        <div class="card">
-          <div class="card-header">
-            <i class="fas fa-bolt me-2"></i>
-            Quick Actions
-          </div>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-md-3 mb-2">
-                <router-link to="/admin/doctors" class="btn btn-secondary w-100">
-                  <i class="fas fa-user-md me-2"></i>
-                  Manage Doctors
-                </router-link>
-              </div>
-              <div class="col-md-3 mb-2">
-                <button class="btn btn-secondary w-100" @click="showSearch = !showSearch">
-                  <i class="fas fa-search me-2"></i>
-                  Search
-                </button>
-              </div>
-              <div class="col-md-3 mb-2">
-                <button class="btn btn-secondary w-100" @click="exportReport">
-                  <i class="fas fa-file-export me-2"></i>
-                  Export Report
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Search Section -->
-    <div v-if="showSearch" class="card mb-4">
-      <div class="card-header">
-        <i class="fas fa-search me-2"></i>
-        Search Patients / Doctors
-      </div>
-      <div class="card-body">
-        <div class="row">
-          <div class="col-md-6">
-            <div class="input-group">
-              <input 
-                type="text" 
-                class="form-control" 
-                placeholder="Search by name, specialization, phone..." 
-                v-model="searchQuery"
-                @keyup.enter="performSearch"
-              >
-              <button class="btn btn-primary" type="button" @click="performSearch">
-                <i class="fas fa-search"></i>
-              </button>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <select class="form-select" v-model="searchType">
-              <option value="all">All</option>
-              <option value="doctors">Doctors Only</option>
-              <option value="patients">Patients Only</option>
-            </select>
-          </div>
-        </div>
-        
-        <!-- Search Results -->
-        <div v-if="searchResults" class="mt-4">
-          <div v-if="searchResults.doctors?.length" class="mb-4">
-            <h6 class="text-white-50 mb-3">
-              <i class="fas fa-user-md me-2"></i>
-              Doctors ({{ searchResults.doctors.length }})
-            </h6>
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Specialization</th>
-                    <th>Experience</th>
-                    <th>Fee</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="doctor in searchResults.doctors" :key="doctor.id">
-                    <td>{{ doctor.name }}</td>
-                    <td>{{ doctor.specialization }}</td>
-                    <td>{{ doctor.experience_years || 0 }} years</td>
-                    <td>${{ doctor.consultation_fee || 0 }}</td>
-                    <td>
-                      <router-link :to="'/admin/doctors?edit=' + doctor.id" class="btn btn-sm btn-primary me-1">
-                        <i class="fas fa-edit"></i>
-                      </router-link>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-          
-          <div v-if="searchResults.patients?.length">
-            <h6 class="text-white-50 mb-3">
-              <i class="fas fa-users me-2"></i>
-              Patients ({{ searchResults.patients.length }})
-            </h6>
-            <div class="table-responsive">
-              <table class="table table-hover">
-                <thead>
-                  <tr>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Blood Group</th>
-                    <th>Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr v-for="patient in searchResults.patients" :key="patient.id">
-                    <td>{{ patient.name }}</td>
-                    <td>{{ patient.phone }}</td>
-                    <td>{{ patient.blood_group || 'N/A' }}</td>
-                    <td>
-                      <button class="btn btn-sm btn-danger" @click="confirmDeletePatient(patient)">
-                        <i class="fas fa-trash"></i>
-                      </button>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          <div v-if="!searchResults.doctors?.length && !searchResults.patients?.length" class="text-center text-muted py-4">
-            <i class="fas fa-search fa-3x mb-3"></i>
-            <p>No results found</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Recent Appointments -->
-    <div class="card">
-      <div class="card-header">
-        <i class="fas fa-calendar-alt me-2"></i>
-        Recent Appointments
-      </div>
-      <div class="card-body">
-        <div v-if="loading" class="text-center py-4">
-          <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-        </div>
-        
-        <div v-else-if="appointments.length === 0" class="text-center text-muted py-4">
-          <i class="fas fa-calendar-times fa-3x mb-3"></i>
-          <p>No appointments found</p>
-        </div>
-        
-        <div v-else class="table-responsive">
-          <table class="table table-hover">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Patient</th>
-                <th>Doctor</th>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="apt in appointments" :key="apt.id">
-                <td>#{{ apt.id }}</td>
-                <td>{{ apt.patient_name }}</td>
-                <td>{{ apt.doctor_name }}</td>
-                <td>{{ formatDate(apt.appointment_date) }}</td>
-                <td>{{ apt.appointment_time }}</td>
-                <td>
-                  <span class="badge" :class="{
-                    'bg-success': apt.status === 'completed',
-                    'bg-warning': apt.status === 'booked',
-                    'bg-danger': apt.status === 'cancelled'
-                  }">
-                    {{ apt.status }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
+    <!-- Main Content -->
+    <div class="main-content">
+      <router-view></router-view>
     </div>
 
     <!-- Delete Confirmation Modal -->
@@ -293,7 +79,9 @@ export default {
   },
   mounted() {
     this.fetchData()
-    this.deleteModal = new bootstrap.Modal(this.$refs.deleteModal)
+    if (this.$refs.deleteModal) {
+      this.deleteModal = new bootstrap.Modal(this.$refs.deleteModal)
+    }
   },
   methods: {
     async fetchData() {
@@ -360,7 +148,101 @@ export default {
     exportReport() {
       // TODO: Implement report export
       alert('Report export feature coming soon!')
+    },
+    
+    logout() {
+      localStorage.clear()
+      this.$router.push('/login')
     }
   }
 }
 </script>
+
+<style scoped>
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 250px;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  padding: 2rem 0;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  overflow-y: auto;
+}
+
+.sidebar-header {
+  padding: 0 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.sidebar-header h3 {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.nav {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin-bottom: 0.5rem;
+}
+
+.nav-link {
+  display: block;
+  padding: 0.75rem 1.5rem;
+  color: var(--text-secondary);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-link.active {
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
+  border-left-color: var(--text-primary);
+}
+
+.nav-link i {
+  width: 20px;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 250px;
+  padding: 2rem;
+  background-color: var(--bg-primary);
+  min-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: relative;
+    height: auto;
+  }
+  
+  .main-content {
+    margin-left: 0;
+    padding: 1rem;
+  }
+  
+  .admin-layout {
+    flex-direction: column;
+  }
+}
+</style>

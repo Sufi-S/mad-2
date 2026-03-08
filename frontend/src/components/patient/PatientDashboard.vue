@@ -43,7 +43,7 @@
         <div v-if="upcomingAppointments.length === 0" class="text-center text-muted py-4">
           <i class="fas fa-calendar-plus fa-3x mb-3"></i>
           <p>No upcoming appointments</p>
-          <router-link to="/book-appointment" class="btn btn-primary">
+          <router-link to="/patient/book-appointment" class="btn btn-primary">
             <i class="fas fa-plus me-2"></i>
             Book Appointment
           </router-link>
@@ -282,7 +282,7 @@ export default {
     },
     
     searchBySpecialization(specialization) {
-      this.$router.push(`/book-appointment?specialization=${specialization}`)
+      this.$router.push(`/patient/book-appointment?specialization=${specialization}`)
     },
     
     formatDate(date) {

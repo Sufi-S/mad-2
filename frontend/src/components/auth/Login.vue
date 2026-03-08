@@ -1,91 +1,88 @@
 <template>
-  <div class="row justify-content-center">
-    <div class="col-md-6 col-lg-4">
-      <div class="card">
-        <div class="card-header">
-          <h4 class="mb-0">
-            <i class="fas fa-sign-in-alt me-2"></i>
-            Login
-          </h4>
+  <div class="login-container">
+    <div class="login-card card">
+      <div class="card-header">
+        <i class="fas fa-sign-in-alt"></i>
+        <h4 class="mb-0">Login</h4>
+      </div>
+      <div class="card-body">
+        <!-- Error Alert -->
+        <div v-if="error" class="alert alert-danger">
+          <i class="fas fa-exclamation-circle me-2"></i>
+          {{ error }}
         </div>
-        <div class="card-body">
-          <!-- Error Alert -->
-          <div v-if="error" class="alert alert-danger">
-            <i class="fas fa-exclamation-circle me-2"></i>
-            {{ error }}
+
+        <!-- Login Form -->
+        <form @submit.prevent="handleLogin">
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-user me-2"></i>
+              Username
+            </label>
+            <input 
+              type="text" 
+              class="form-control" 
+              v-model="credentials.username"
+              required
+              placeholder="Enter username"
+            >
           </div>
 
-          <!-- Login Form -->
-          <form @submit.prevent="handleLogin">
-            <div class="form-group">
-              <label class="form-label">
-                <i class="fas fa-user me-2"></i>
-                Username
-              </label>
-              <input 
-                type="text" 
-                class="form-control" 
-                v-model="credentials.username"
-                required
-                placeholder="Enter username"
-              >
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">
-                <i class="fas fa-lock me-2"></i>
-                Password
-              </label>
-              <input 
-                type="password" 
-                class="form-control" 
-                v-model="credentials.password"
-                required
-                placeholder="Enter password"
-              >
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100" :disabled="loading">
-              <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
-              <i v-else class="fas fa-sign-in-alt me-2"></i>
-              {{ loading ? 'Logging in...' : 'Login' }}
-            </button>
-          </form>
-
-          <hr class="my-4">
-
-          <div class="text-center">
-            <p class="text-muted mb-2">Don't have an account?</p>
-            <router-link to="/register" class="btn btn-secondary w-100">
-              <i class="fas fa-user-plus me-2"></i>
-              Register as Patient
-            </router-link>
+          <div class="form-group">
+            <label class="form-label">
+              <i class="fas fa-lock me-2"></i>
+              Password
+            </label>
+            <input 
+              type="password" 
+              class="form-control" 
+              v-model="credentials.password"
+              required
+              placeholder="Enter password"
+            >
           </div>
 
-          <!-- Demo Credentials -->
-          <div class="mt-4 p-3 bg-dark rounded">
-            <small class="text-muted d-block mb-2">
-              <i class="fas fa-info-circle me-1"></i>
-              Demo Credentials:
-            </small>
-            <div class="row g-2">
-              <div class="col-6">
-                <div class="p-2 bg-black rounded">
-                  <strong class="text-white-50 d-block">Admin</strong>
-                  <small class="text-muted">admin / admin123</small>
-                </div>
+          <button type="submit" class="btn btn-primary w-100" :disabled="loading">
+            <span v-if="loading" class="spinner-border spinner-border-sm me-2"></span>
+            <i v-else class="fas fa-sign-in-alt me-2"></i>
+            {{ loading ? 'Logging in...' : 'LOGIN' }}
+          </button>
+        </form>
+
+        <hr>
+
+        <div class="text-center">
+          <p class="text-muted mb-2">Don't have an account?</p>
+          <br>
+          <router-link to="/register" class="btn btn-secondary w-100">
+            <i class="fas fa-user-plus me-2"></i>
+            REGISTER AS PATIENT
+          </router-link>
+        </div>
+
+        <!-- Demo Credentials -->
+        <div class="demo-credentials">
+          <small>
+            <i class="fas fa-info-circle me-1"></i>
+            Demo Credentials:
+          </small>
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="credential-item">
+                <strong>Admin</strong>
+                <small>admin / admin123</small>
               </div>
-              <div class="col-6">
-                <div class="p-2 bg-black rounded">
-                  <strong class="text-white-50 d-block">Doctor</strong>
-                  <small class="text-muted">doctor / doctor123</small>
-                </div>
+            </div>
+            <div class="col-6">
+              <div class="credential-item">
+                <strong>Doctor</strong>
+                <small>doctor / doctor123</small>
               </div>
-              <div class="col-12 mt-2">
-                <div class="p-2 bg-black rounded">
-                  <strong class="text-white-50 d-block">Patient</strong>
-                  <small class="text-muted">patient / patient123</small>
-                </div>
+            </div>
+            <div class="col-12">
+              <div class="credential-item">
+                <strong>Patient</strong>
+                <small>patient / patient123</small>
               </div>
             </div>
           </div>
@@ -127,7 +124,7 @@ export default {
           localStorage.setItem('profile', JSON.stringify(userData.profile))
         }
         
-        // FIXED: Redirect based on role instead of emitting event
+        // Redirect based on role
         const role = userData.user.role
         
         if (role === 'admin') {
@@ -137,7 +134,6 @@ export default {
         } else if (role === 'patient') {
           this.$router.push('/patient/dashboard')
         } else {
-          // Fallback to home if role is unknown
           this.$router.push('/')
         }
         
@@ -150,3 +146,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Add any component-specific styles here if needed */
+</style>

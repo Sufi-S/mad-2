@@ -634,3 +634,97 @@ body {
 .slide-enter, .slide-leave-to {
     transform: translateX(100%);
 }
+
+/* ============= FIXES ADDED BELOW ============= */
+
+/* Fix 1 - Center Login Page */
+.login-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Fix 2 - Fix Register Button Overlap */
+.login-card hr {
+    border-color: var(--border-color);
+    margin: 1.5rem 0;
+}
+
+.login-card .btn {
+    margin-top: 0.5rem;
+}
+
+/* Fix 3 - Demo Credentials Layout */
+.demo-credentials {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--bg-secondary);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.demo-credentials small {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Fix 4 - Prevent White Line Issue */
+hr {
+    border: none;
+    height: 1px;
+    background-color: var(--border-color);
+}
+
+/* Additional Polish - Make Login Card Look Premium */
+.login-card {
+    max-width: 450px;
+    width: 100%;
+    margin: 0 auto;
+}
+
+.login-card .card-header {
+    text-align: center;
+    padding: 1.5rem;
+}
+
+.login-card .card-header h4 {
+    font-size: 1.75rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.login-card .card-header i {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+/* Demo credentials grid improvement */
+.demo-credentials .row {
+    margin-top: 0.5rem;
+}
+
+.demo-credentials .bg-black {
+    background-color: var(--bg-tertiary) !important;
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.demo-credentials .bg-black:hover {
+    border-color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.demo-credentials strong {
+    color: var(--text-primary) !important;
+    font-size: 0.9rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.demo-credentials small {
+    color: var(--text-muted) !important;
+    font-family: monospace;
+    font-size: 0.8rem;
+}
