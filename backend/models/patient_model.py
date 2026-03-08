@@ -15,8 +15,8 @@ class Patient(db.Model):
     emergency_contact = db.Column(db.String(20))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
-    # Relationships
-    appointments = db.relationship('Appointment', backref='patient', lazy=True, cascade='all, delete-orphan')
+    # Relationships - Using back_populates for bidirectional relationship
+    appointments = db.relationship('Appointment', back_populates='patient', lazy=True, cascade='all, delete-orphan')
     treatments = db.relationship('Treatment', backref='patient', lazy=True)
     
     def to_dict(self):
